@@ -1,0 +1,8 @@
+{
+  "observed_at": "2026-04-25T15:34:56.493Z",
+  "provider": "codex",
+  "event_name": "UserPromptSubmit",
+  "session_id": "019dc51e-8e03-7b91-8a41-ce0dadd06977",
+  "turn_id": "019dc547-95d2-72d3-bd37-708d19168f1f",
+  "prompt_summary": "help me upgrade dependencies this docker image"
+}

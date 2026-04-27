@@ -20,15 +20,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /tmp/* && \
     rm -rf /var/lib/apt/lists/*
 
-ENV CUDA_VERSION 11.2.2
+ENV CUDA_VERSION 12.4.0
 #ENV CUDA_PKG_VERSION 11-2=$CUDA_VERSION-1
 #ENV CUDART_VERSION 11-2=$CUDA_VERSION46-1
 
 # For libraries in the cuda-compat-* package: https://docs.nvidia.com/cuda/eula/index.html#attachment-a
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    cuda-cudart-11-2=11.2.152-1 \
-    cuda-compat-11-2 \
-    && ln -s cuda-11.2 /usr/local/cuda && \
+    cuda-cudart-12-4=12.4.0-1 \
+    cuda-compat-12-4 \
+    && ln -s cuda-12.4 /usr/local/cuda && \
     rm -rf /var/lib/apt/lists/* && \
     # Cleanup - cannot use cleanup script here, otherwise too much is removed
     apt-get clean && \
@@ -48,20 +48,20 @@ ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64
 # nvidia-container-runtime
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
-ENV NVIDIA_REQUIRE_CUDA "cuda>=11.2 brand=tesla,driver>=418,driver<419 brand=tesla,driver>=440,driver<441 driver>=450"
+ENV NVIDIA_REQUIRE_CUDA "cuda>=12.4 brand=tesla,driver>=520"
 
 ### CUDA RUNTIME ###
 # https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/11.2.2/ubuntu20.04-x86_64/runtime/Dockerfile
 
-ENV NCCL_VERSION 2.8.4
+ENV NCCL_VERSION 2.21.5
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    cuda-libraries-11-2=11.2.2-1 \
-    libnpp-11-2=11.3.2.152-1 \
-    cuda-nvtx-11-2=11.2.152-1 \
-    libcublas-11-2=11.4.1.1043-1 \
-    libcusparse-11-2=11.4.1.1152-1 \
-    libnccl2=$NCCL_VERSION-1+cuda11.2 \
+    cuda-libraries-12-4=12.4.0-1 \
+    libnpp-12-4=12.4.0-1 \
+    cuda-nvtx-12-4=12.4.0-1 \
+    libcublas-12-4=12.4.0-1 \
+    libcusparse-12-4=12.4.0-1 \
+    libnccl2=$NCCL_VERSION-1+cuda12.4 \
     && rm -rf /var/lib/apt/lists/* \
     # Cleanup - cannot use cleanup script here, otherwise too much is removed
     && apt-get clean \
@@ -69,23 +69,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /tmp/* \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-mark hold libcublas-11-2 libnccl2
+RUN apt-mark hold libcublas-12-4 libnccl2
 
 ### END CUDA RUNTIME ###
 
 ### CUDA DEVEL ###
 # https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/11.2.2/ubuntu20.04-x86_64/devel/Dockerfile
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libtinfo5 libncursesw5 \
-    cuda-cudart-dev-11-2=11.2.152-1 \
-    cuda-command-line-tools-11-2=11.2.2-1 \
-    cuda-minimal-build-11-2=11.2.2-1 \
-    cuda-libraries-dev-11-2=11.2.2-1 \
-    cuda-nvml-dev-11-2=11.2.152-1 \
-    libnpp-dev-11-2=11.3.2.152-1 \
-    libnccl-dev=2.8.4-1+cuda11.2 \
-    libcublas-dev-11-2=11.4.1.1043-1 \
-    libcusparse-dev-11-2=11.4.1.1152-1 && \
+    libtinfo6 libncursesw6 \
+    cuda-cudart-dev-12-4=12.4.0-1 \
+    cuda-command-line-tools-12-4=12.4.0-1 \
+    cuda-minimal-build-12-4=12.4.0-1 \
+    cuda-libraries-dev-12-4=12.4.0-1 \
+    cuda-nvml-dev-12-4=12.4.0-1 \
+    libnpp-dev-12-4=12.4.0-1 \
+    libnccl-dev=$NCCL_VERSION-1+cuda12.4 \
+    libcublas-dev-12-4=12.4.0-1 \
+    libcusparse-dev-12-4=12.4.0-1 && \
     # Cleanup - cannot use cleanup script here, otherwise too much is removed
     apt-get clean && \
     rm -rf $HOME/.cache/* && \
@@ -93,7 +93,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # apt from auto upgrading the cublas package. See https://gitlab.com/nvidia/container-images/cuda/-/issues/88
-RUN apt-mark hold libcublas-dev-11-2 libnccl-dev
+RUN apt-mark hold libcublas-dev-12-4 libnccl-dev
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 
 ### END CUDA DEVEL ###
@@ -101,12 +101,12 @@ ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 ### CUDANN8 DEVEL ###
 # https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/11.2.2/ubuntu20.04-x86_64/devel/cudnn8/Dockerfile
 
-ENV CUDNN_VERSION 8.1.1.33
+ENV CUDNN_VERSION 8.9.7.29
 LABEL com.nvidia.cudnn.version="${CUDNN_VERSION}"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libcudnn8=$CUDNN_VERSION-1+cuda11.2 \
-    libcudnn8-dev=$CUDNN_VERSION-1+cuda11.2 \
+    libcudnn8=$CUDNN_VERSION-1+cuda12.4 \
+    libcudnn8-dev=$CUDNN_VERSION-1+cuda12.4 \
     && apt-mark hold libcudnn8 && \
     # Cleanup
     apt-get clean && \
@@ -128,10 +128,10 @@ RUN \
     # uninstall cpu only packages via conda
     conda remove --force -y pytorch cpuonly && \
     # https://pytorch.org/get-started/locally/
-    conda install cudatoolkit=11.2 -c pytorch -c nvidia && \
-    pip install --no-cache-dir torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html && \
+    conda install cudatoolkit=12.4 -c pytorch -c nvidia && \
+    pip install --no-cache-dir torch==2.5.1+cu124 torchvision==0.20.1+cu124 torchaudio==2.5.1+cu124 -f https://download.pytorch.org/whl/torch_stable.html && \
     # Install cupy: https://cupy.chainer.org/
-    pip install --no-cache-dir cupy-cuda112 && \
+    pip install --no-cache-dir cupy-cuda12x && \
     # Install pycuda: https://pypi.org/project/pycuda
     pip install --no-cache-dir pycuda && \
     # Install gpu utils libs
@@ -140,24 +140,23 @@ RUN \
     pip install --no-cache-dir scikit-cuda && \
     # Install tensorflow gpu
     pip uninstall -y tensorflow tensorflow-cpu intel-tensorflow && \
-    pip install --no-cache-dir tensorflow-gpu==2.5.0 && \
+    pip install --no-cache-dir tensorflow==2.15.0 && \
     # Install ONNX GPU Runtime
     pip uninstall -y onnxruntime && \
-    pip install --no-cache-dir onnxruntime-gpu==1.8.0 onnxruntime-training==1.8.0 && \
+    pip install --no-cache-dir onnxruntime-gpu==1.20.0 && \
     # Install faiss gpu - TODO: to large?
     # conda remove --force -y faiss-cpu && \
     # conda install -y faiss-gpu -c pytorch && \
     # Update mxnet to gpu edition
     pip uninstall -y mxnet-mkl && \
-    # cuda111 -> >= 11.1
-    pip install --no-cache-dir mxnet-cu112 && \
+    pip install --no-cache-dir mxnet-cu120 && \
     # install jax: https://github.com/google/jax#pip-installation
-    pip install --upgrade jax[cuda111] -f https://storage.googleapis.com/jax-releases/jax_releases.html && \
+    pip install --upgrade jax[cuda12] -f https://storage.googleapis.com/jax-releases/jax_releases.html && \
     # Install pygpu - Required for theano: http://deeplearning.net/software/libgpuarray/
     conda install -y pygpu && \
     # Install lightgbm
     pip uninstall -y lightgbm && \
-    pip install lightgbm --install-option=--gpu --install-option="--opencl-include-dir=/usr/local/cuda/include/" --install-option="--opencl-library=/usr/local/cuda/lib64/libOpenCL.so"  && \
+    pip install --no-cache-dir lightgbm --install-option=--gpu --install-option="--opencl-include-dir=/usr/local/cuda/include/" --install-option="--opencl-library=/usr/local/cuda/lib64/libOpenCL.so" && \
     # nvidia python ml lib
     pip install --upgrade --force-reinstall nvidia-ml-py3 && \
     # SpeedTorch: https://github.com/Santosh-Gupta/SpeedTorch
